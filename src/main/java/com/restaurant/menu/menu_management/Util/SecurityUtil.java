@@ -21,27 +21,27 @@ public class SecurityUtil {
         this.jwtEncoder = jwtEncoder;
     }
 
+    // Thuật toán mã hóa JWT (HS512)
     public static final MacAlgorithm JWT_ALGORITHM = MacAlgorithm.HS512;
 
-    @Value("${hoidanit.jwt.base64-secret}")
-    private String jwtKey;
-
-    @Value("${hoidanit.jwt.token-validity-in-seconds}")
+    // Thời gian của token (giây), lấy từ file cấu hình
+    @Value("${jwt.token-validity-in-seconds}")
     private long jwtExpiration;
 
+    // Tạo token JWT từ thông tin xác thực (Từ authController)
     public String createToken(Authentication authentication) {
-        Instant now = Instant.now();
+        Instant now = Instant.now(); // Lấy thời gian hiện tại và tạo thời gian hết hạn token
         Instant validity = now.plus(this.jwtExpiration, ChronoUnit.SECONDS);
 
-        // @formatter:off
         JwtClaimsSet claims = JwtClaimsSet.builder()
-               .issuedAt(now)
-            .expiresAt(validity)
-            .subject(authentication.getName())
-            .claim("hoidanit", authentication)
-            .build();
+                .issuedAt(now)
+                .expiresAt(validity)
+                .subject(authentication.getName())
+                .claim("jwt", authentication)
+                .build();
 
         JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();
         return this.jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
     }
+
 }

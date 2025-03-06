@@ -12,24 +12,26 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import com.restaurant.menu.menu_management.Domain.RestResponse;
 
 @RestControllerAdvice
 public class GlobalException {
 
-    
-    @ExceptionHandler(value = {IdInvalidException.class,UsernameNotFoundException.class,BadCredentialsException.class})
-    public ResponseEntity<RestResponse<Object>> handleIdException(IdInvalidException idException) {
-        RestResponse<Object> res = new RestResponse<Object>();
+    @ExceptionHandler({ IdInvalidException.class, UsernameNotFoundException.class,
+            BadCredentialsException.class, NoResourceFoundException.class })
+    public ResponseEntity<RestResponse<Object>> handleExceptions(Exception ex) {
+        RestResponse<Object> res = new RestResponse<>();
         res.setStatusCode(HttpStatus.BAD_REQUEST.value());
-        res.setError(idException.getMessage());
+        res.setError(ex.getMessage());
         res.setMessage("Exception occurs...");
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
     }
 
-    //Dùng để bắt exception MethodArgumentNotValidException từ authController.
-    //Khi người dùng để trống user hoặc password thì sẽ vi phạm trong LoginDTO Domain. (exception)
+    // Dùng để bắt exception MethodArgumentNotValidException từ authController.
+    // Khi người dùng để trống user hoặc password thì sẽ vi phạm trong LoginDTO
+    // Domain. (exception)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<RestResponse<Object>> validationError(MethodArgumentNotValidException ex) {
         BindingResult result = ex.getBindingResult();
