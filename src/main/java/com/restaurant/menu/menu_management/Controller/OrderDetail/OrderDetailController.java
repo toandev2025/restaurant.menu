@@ -17,12 +17,20 @@ public class OrderDetailController {
         this.orderDetailService = orderDetailService;
     }
 
-    @GetMapping("/{orderId}")
-    public ResponseEntity<List<OrderDetail>> getOrderDetailsByOrderId(@PathVariable("orderId") Long orderId) {
+    // @GetMapping("/{orderId}")
+    // public ResponseEntity<List<OrderDetail>>
+    // getOrderDetailsByOrderId(@PathVariable("orderId") Long orderId) {
+    // return
+    // ResponseEntity.ok(this.orderDetailService.fetchOrderDetailsByOrderId(orderId));
+    // }
+
+    @GetMapping("/by-order/{id}")
+    public ResponseEntity<List<OrderDetail>> getOrderDetailsByOrderId(@PathVariable("id") Long orderId) {
         return ResponseEntity.ok(this.orderDetailService.fetchOrderDetailsByOrderId(orderId));
     }
 
-    @GetMapping("/detail/{id}")
+    // Chỉ api này hoạt động.
+    @GetMapping("/{id}")
     public ResponseEntity<OrderDetail> getOrderDetailById(@PathVariable("id") Long id) {
         return ResponseEntity.ok(this.orderDetailService.fetchOrderDetailById(id));
     }

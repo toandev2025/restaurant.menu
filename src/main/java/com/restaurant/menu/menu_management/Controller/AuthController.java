@@ -1,7 +1,7 @@
 package com.restaurant.menu.menu_management.Controller;
 
-import com.restaurant.menu.menu_management.Domain.LoginDTO;
-import com.restaurant.menu.menu_management.Domain.ResLoginDTO;
+import com.restaurant.menu.menu_management.Domain.DTO.LoginDTO;
+import com.restaurant.menu.menu_management.Domain.DTO.ResLoginDTO;
 import com.restaurant.menu.menu_management.Util.SecurityUtil;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;

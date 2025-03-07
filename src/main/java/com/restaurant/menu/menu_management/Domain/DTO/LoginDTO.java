@@ -1,4 +1,4 @@
-package com.restaurant.menu.menu_management.Domain;
+package com.restaurant.menu.menu_management.Domain.DTO;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -1,6 +1,7 @@
 package com.restaurant.menu.menu_management.Service.Order;
 
 import com.restaurant.menu.menu_management.Domain.*;
+import com.restaurant.menu.menu_management.Domain.DTO.OrderDTO;
 import com.restaurant.menu.menu_management.Repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,27 +40,36 @@ public class OrderService {
         return null;
     }
 
+    /** Fetch Order theo ID và chuyển đổi sang OrderDTO */
+    public OrderDTO fetchOrderByIdDTO(Long id) {
+        return orderRepository.findById(id)
+                .map(OrderDTO::new) // Chuyển đổi Order sang OrderDTO nếu tồn tại
+                .orElse(null); // Trả về null nếu không tìm thấy
+    }
+
+    /** Create Order */
     @Transactional
     public Order createOrder(Order orderRequest) {
-        // 🔹 Kiểm tra user có tồn tại không
-        User user = this.userRepository.findById(orderRequest.getUser().getId())
+        User user = userRepository.findById(orderRequest.getUser().getId())
                 .orElseThrow(() -> new IllegalArgumentException("User ID không tồn tại"));
 
-        // 🔹 Kiểm tra thông tin đơn hàng
         validateOrder(orderRequest);
 
-        // 🔹 BƯỚC 1: Tạo Order trước
         Order newOrder = new Order();
         newOrder.setUser(user);
         newOrder.setOrderType(orderRequest.getOrderType());
         newOrder.setTableNumber(orderRequest.getTableNumber());
+        newOrder.setTotalAmount(0.0);
         newOrder.setLocation(orderRequest.getLocation());
         newOrder.setStatus(orderRequest.getStatus() != null ? orderRequest.getStatus() : "PENDING");
+        newOrder.setPaymentMethod(orderRequest.getPaymentMethod());
+        newOrder.setDeliveryAddress(orderRequest.getDeliveryAddress());
+        newOrder.setPhoneNumber(orderRequest.getPhoneNumber());
+        newOrder.setNote(orderRequest.getNote());
 
-        newOrder = orderRepository.save(newOrder); // Lưu để lấy ID
+        newOrder = this.orderRepository.save(newOrder);
 
-        // 🔹 BƯỚC 2: Tạo OrderDetail từ danh sách món ăn
-        double totalPrice = 0.0;
+        double totalAmount = 0.0;
         for (OrderDetail od : orderRequest.getOrderDetails()) {
             Dish dish = dishRepository.findById(od.getDish().getId())
                     .orElseThrow(() -> new IllegalArgumentException("Dish ID không tồn tại"));
@@ -68,46 +78,58 @@ public class OrderService {
             orderDetail.setOrder(newOrder);
             orderDetail.setDish(dish);
             orderDetail.setQuantity(od.getQuantity());
-            orderDetail.setPriceAtOrderTime(dish.getPrice() * od.getQuantity());
+            orderDetail.setUnitPrice(dish.getPrice()); // Lưu giá tại thời điểm đặt hàng
+            orderDetail.calculateSubtotal(); // Tính toán subtotal
 
             orderDetailRepository.save(orderDetail);
 
-            totalPrice += dish.getPrice() * od.getQuantity();
+            totalAmount += orderDetail.getSubtotal();
         }
 
-        // 🔹 BƯỚC 3: Cập nhật tổng giá đơn hàng
-        newOrder.setTotalPrice(totalPrice);
+        newOrder.setTotalAmount(totalAmount);
         return orderRepository.save(newOrder);
     }
 
-    /** Cập nhật Order */
     @Transactional
     public Order updateOrder(Order updatedOrder) {
+        // Lấy đơn hàng hiện tại từ cơ sở dữ liệu
         Order existingOrder = fetchOrderById(updatedOrder.getId());
 
-        // Cập nhật thông tin đơn hàng
+        // Cập nhật thông tin chung của đơn hàng
         existingOrder.setOrderType(updatedOrder.getOrderType());
         existingOrder.setTableNumber(updatedOrder.getTableNumber());
         existingOrder.setLocation(updatedOrder.getLocation());
+        existingOrder.setPaymentMethod(updatedOrder.getPaymentMethod());
+        existingOrder.setDeliveryAddress(updatedOrder.getDeliveryAddress());
+        existingOrder.setPhoneNumber(updatedOrder.getPhoneNumber());
+        existingOrder.setNote(updatedOrder.getNote());
+        existingOrder.setStatus(updatedOrder.getStatus());
 
-        // Xóa OrderDetail cũ
+        // Xóa tất cả OrderDetail cũ liên quan đến đơn hàng này
         orderDetailRepository.deleteAll(existingOrder.getOrderDetails());
 
         // Cập nhật lại danh sách OrderDetail mới
-        double totalPrice = 0.0;
+        double totalAmount = 0.0;
         for (OrderDetail od : updatedOrder.getOrderDetails()) {
-            Dish dish = dishRepository.findById(od.getDish().getId()).orElseThrow();
+            Dish dish = dishRepository.findById(od.getDish().getId())
+                    .orElseThrow(() -> new IllegalArgumentException("Dish ID không tồn tại"));
+
             OrderDetail orderDetail = new OrderDetail();
             orderDetail.setOrder(existingOrder);
             orderDetail.setDish(dish);
             orderDetail.setQuantity(od.getQuantity());
-            orderDetail.setPriceAtOrderTime(dish.getPrice() * od.getQuantity());
+            orderDetail.setUnitPrice(dish.getPrice()); // Lưu giá tại thời điểm cập nhật
+            orderDetail.calculateSubtotal(); // Tính toán subtotal
+
             orderDetailRepository.save(orderDetail);
 
-            totalPrice += dish.getPrice() * od.getQuantity();
+            totalAmount += orderDetail.getSubtotal(); // Cộng dồn vào tổng giá trị đơn hàng
         }
 
-        existingOrder.setTotalPrice(totalPrice);
+        // Cập nhật tổng giá trị đơn hàng
+        existingOrder.setTotalAmount(totalAmount);
+
+        // Lưu và trả về đơn hàng đã cập nhật
         return orderRepository.save(existingOrder);
     }
 

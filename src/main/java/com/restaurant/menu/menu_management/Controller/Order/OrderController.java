@@ -1,8 +1,10 @@
 package com.restaurant.menu.menu_management.Controller.Order;
 
 import com.restaurant.menu.menu_management.Domain.Order;
-import com.restaurant.menu.menu_management.Domain.OrderDTO;
+import com.restaurant.menu.menu_management.Domain.DTO.OrderDTO;
 import com.restaurant.menu.menu_management.Service.Order.OrderService;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,10 +26,15 @@ public class OrderController {
         return ResponseEntity.ok(orderDTOs);
     }
 
-    /** Lấy Order theo ID */
+    /** Lấy Order theo ID dưới dạng DTO */
     @GetMapping("/{id}")
-    public ResponseEntity<Order> getOrderById(@PathVariable("id") Long id) {
-        return ResponseEntity.ok(this.orderService.fetchOrderById(id));
+    public ResponseEntity<OrderDTO> getOrderById(@PathVariable("id") Long id) {
+        OrderDTO orderDTO = this.orderService.fetchOrderByIdDTO(id);
+        if (orderDTO != null) {
+            return ResponseEntity.ok(orderDTO);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null); // Hoặc trả về thông báo lỗi
+        }
     }
 
     /** Tạo Order mới */

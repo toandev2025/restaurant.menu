@@ -1,6 +1,8 @@
-package com.restaurant.menu.menu_management.Domain;
+package com.restaurant.menu.menu_management.Domain.DTO;
 
 import java.time.LocalDateTime;
+
+import com.restaurant.menu.menu_management.Domain.Order;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -13,7 +15,7 @@ public class OrderDTO {
     private String orderType;
     private Integer tableNumber;
     private String location;
-    private Double totalPrice;
+    private Double totalAmount;
     private String status;
     private LocalDateTime orderTime;
 
@@ -23,7 +25,7 @@ public class OrderDTO {
         this.orderType = order.getOrderType();
         this.tableNumber = order.getTableNumber();
         this.location = order.getLocation();
-        this.totalPrice = order.getTotalPrice();
+        this.totalAmount = order.getTotalAmount();
         this.status = order.getStatus();
         this.orderTime = order.getOrderTime();
     }

@@ -5,7 +5,6 @@ import com.restaurant.menu.menu_management.Repository.OrderDetailRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class OrderDetailService {
@@ -20,8 +19,8 @@ public class OrderDetailService {
     }
 
     public OrderDetail fetchOrderDetailById(Long id) {
-        Optional<OrderDetail> orderDetail = this.orderDetailRepository.findById(id);
-        return orderDetail.orElse(null);
+        return orderDetailRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("OrderDetail ID không tồn tại: " + id));
     }
 
     public OrderDetail createOrderDetail(OrderDetail orderDetail) {
