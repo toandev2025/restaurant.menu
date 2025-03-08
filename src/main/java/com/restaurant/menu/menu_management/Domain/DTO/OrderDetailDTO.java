@@ -5,6 +5,8 @@ import lombok.Setter;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 @Getter
 @Setter
 public class OrderDetailDTO {
@@ -16,8 +18,7 @@ public class OrderDetailDTO {
     @Getter
     @Setter
     public static class Item {
-        private Long id;
-        private Long orderId;
+        private Long orderDetail_id;
         private Dish dish;
         private Integer quantity;
         private Double unitPrice;

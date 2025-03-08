@@ -2,7 +2,9 @@ package com.restaurant.menu.menu_management.Controller.Order;
 
 import com.restaurant.menu.menu_management.Domain.Order;
 import com.restaurant.menu.menu_management.Domain.DTO.OrderDTO;
+import com.restaurant.menu.menu_management.Domain.DTO.OrderDetailDTO;
 import com.restaurant.menu.menu_management.Service.Order.OrderService;
+import com.restaurant.menu.menu_management.Service.OrderDetail.OrderDetailService;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,9 +16,11 @@ import java.util.List;
 @RequestMapping("/api/v1/orders")
 public class OrderController {
     private final OrderService orderService;
+    private final OrderDetailService orderDetailService;
 
-    public OrderController(OrderService orderService) {
+    public OrderController(OrderService orderService, OrderDetailService orderDetailService) {
         this.orderService = orderService;
+        this.orderDetailService = orderDetailService;
     }
 
     /** Lấy tất cả Order dưới dạng DTO */
@@ -40,14 +44,17 @@ public class OrderController {
     /** Tạo Order mới */
     @PostMapping("/create")
     public ResponseEntity<OrderDTO> createOrder(@RequestBody Order order) {
-        Order newOrder = orderService.createOrder(order);
-        return ResponseEntity.ok(new OrderDTO(newOrder));
+        Order newOrder = this.orderService.createOrder(order);
+        OrderDetailDTO detailDTO = this.orderDetailService.fetchOrderDetailsByOrderId(newOrder.getId());
+        return ResponseEntity.ok(new OrderDTO(newOrder, detailDTO));
     }
 
     /** Cập nhật Order */
     @PutMapping("/update")
-    public ResponseEntity<Order> updateOrder(@RequestBody Order order) {
-        return ResponseEntity.ok(this.orderService.updateOrder(order));
+    public ResponseEntity<OrderDTO> updateOrder(@RequestBody Order order) {
+        Order newOrder = this.orderService.updateOrder(order);
+        OrderDetailDTO detailDTO = this.orderDetailService.fetchOrderDetailsByOrderId(newOrder.getId());
+        return ResponseEntity.ok(new OrderDTO(newOrder, detailDTO));
     }
 
     /** Xóa Order */

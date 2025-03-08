@@ -1,6 +1,7 @@
 package com.restaurant.menu.menu_management.Controller.OrderDetail;
 
 import com.restaurant.menu.menu_management.Domain.OrderDetail;
+import com.restaurant.menu.menu_management.Domain.DTO.OrderDetailDTO;
 import com.restaurant.menu.menu_management.Service.OrderDetail.OrderDetailService;
 
 import org.springframework.http.ResponseEntity;
@@ -17,32 +18,14 @@ public class OrderDetailController {
         this.orderDetailService = orderDetailService;
     }
 
-    // @GetMapping("/{orderId}")
-    // public ResponseEntity<List<OrderDetail>>
-    // getOrderDetailsByOrderId(@PathVariable("orderId") Long orderId) {
-    // return
-    // ResponseEntity.ok(this.orderDetailService.fetchOrderDetailsByOrderId(orderId));
-    // }
-
     @GetMapping("/by-order/{id}")
-    public ResponseEntity<List<OrderDetail>> getOrderDetailsByOrderId(@PathVariable("id") Long orderId) {
-        return ResponseEntity.ok(this.orderDetailService.fetchOrderDetailsByOrderId(orderId));
-    }
+    public ResponseEntity<OrderDetailDTO> getOrderDetailsByOrderId(@PathVariable("id") Long orderId) {
+        OrderDetailDTO orderDetailDTO = orderDetailService.fetchOrderDetailsByOrderId(orderId);
 
-    // Chỉ api này hoạt động.
-    @GetMapping("/{id}")
-    public ResponseEntity<OrderDetail> getOrderDetailById(@PathVariable("id") Long id) {
-        return ResponseEntity.ok(this.orderDetailService.fetchOrderDetailById(id));
-    }
+        if (orderDetailDTO == null) {
+            return ResponseEntity.status(404).build(); // Trả về 404 nếu không tìm thấy Order
+        }
 
-    @PostMapping("/create")
-    public ResponseEntity<OrderDetail> createOrderDetail(@RequestBody OrderDetail orderDetail) {
-        return ResponseEntity.ok(this.orderDetailService.createOrderDetail(orderDetail));
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteOrderDetail(@PathVariable("id") Long id) {
-        this.orderDetailService.deleteOrderDetail(id);
-        return ResponseEntity.ok("Order Detail Deleted");
+        return ResponseEntity.ok(orderDetailDTO);
     }
 }
