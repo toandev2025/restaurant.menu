@@ -1,7 +1,6 @@
 package com.restaurant.menu.menu_management.Domain.DTO;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import com.restaurant.menu.menu_management.Domain.Order;
 
@@ -25,6 +24,7 @@ public class OrderDTO {
     private OrderDetailDTO orderDetailsDTO;
     private ReviewDTO reviewDTO;
 
+    // Constructor nhận Order và OrderDetailDTO
     public OrderDTO(Order order, OrderDetailDTO orderDetailDTO) {
         this.id = order.getId();
         this.user = new UserDTO(order.getUser());
@@ -40,6 +40,7 @@ public class OrderDTO {
         this.orderDetailsDTO = orderDetailDTO;
     }
 
+    // Constructor nhận Order và ReviewDTO
     public OrderDTO(Order order, ReviewDTO reviewDTO) {
         this.id = order.getId();
         this.user = new UserDTO(order.getUser());
@@ -55,5 +56,18 @@ public class OrderDTO {
         this.reviewDTO = reviewDTO;
     }
 
-    // Getters và Setters
+    // Constructor nhận Order
+    public OrderDTO(Order order) {
+        this.id = order.getId();
+        this.user = new UserDTO(order.getUser());
+        this.orderType = order.getOrderType();
+        this.tableNumber = order.getTableNumber();
+        this.location = order.getLocation();
+        this.phoneNumber = order.getPhoneNumber();
+        this.paymentMethod = order.getPaymentMethod();
+        this.note = order.getNote();
+        this.totalAmount = order.getTotalAmount();
+        this.status = order.getStatus();
+        this.orderTime = order.getOrderTime();
+    }
 }

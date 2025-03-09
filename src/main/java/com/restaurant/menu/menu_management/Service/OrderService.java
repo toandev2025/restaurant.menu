@@ -109,66 +109,25 @@ public class OrderService {
         return this.orderRepository.save(newOrder);
     }
 
-    /** Update Order */
     @Transactional
     public Order updateOrder(Order orderRequest) {
-
+        // Lấy đơn hàng hiện tại từ DB
         Order existingOrder = fetchOrderById(orderRequest.getId());
 
-        validateOrder(orderRequest); // Kiểm tra tính hợp lệ của orderRequest
+        // Không cập nhật danh sách món ăn (orderDetails)
+        if (orderRequest.getOrderDetails() != null && !orderRequest.getOrderDetails().isEmpty()) {
+            throw new IllegalStateException("Không thể chỉnh sửa danh sách món ăn! Hãy xóa đơn hàng và đặt lại.");
+        }
 
-        // Cập nhật thông tin Order (nếu có)
+        // Không cập nhật status & paymentMethod
         existingOrder.setOrderType(orderRequest.getOrderType());
         existingOrder.setTableNumber(orderRequest.getTableNumber());
         existingOrder.setLocation(orderRequest.getLocation());
-        existingOrder
-                .setStatus(orderRequest.getStatus() != null ? orderRequest.getStatus() : existingOrder.getStatus());
-        existingOrder.setPaymentMethod(orderRequest.getPaymentMethod());
         existingOrder.setDeliveryAddress(orderRequest.getDeliveryAddress());
         existingOrder.setPhoneNumber(orderRequest.getPhoneNumber());
         existingOrder.setNote(orderRequest.getNote());
 
-        // Lấy danh sách OrderDetail hiện tại của Order
-        List<OrderDetail> existingOrderDetails = orderDetailRepository.findByOrderId(existingOrder.getId());
-
-        // Tạo một Map để kiểm tra OrderDetail nào cần cập nhật hoặc xóa
-        Map<Long, OrderDetail> existingOrderDetailMap = existingOrderDetails.stream()
-                .collect(Collectors.toMap(od -> od.getDish().getId(), od -> od));
-
-        double totalAmount = 0.0;
-
-        for (OrderDetail od : orderRequest.getOrderDetails()) {
-            Dish dish = dishRepository.findById(od.getDish().getId())
-                    .orElseThrow(() -> new IllegalArgumentException("Dish ID không tồn tại"));
-
-            if (existingOrderDetailMap.containsKey(dish.getId())) {
-                // Nếu món đã có, chỉ cần cập nhật số lượng
-                OrderDetail existingDetail = existingOrderDetailMap.get(dish.getId());
-                existingDetail.setQuantity(od.getQuantity());
-                existingDetail.calculateSubtotal();
-                totalAmount += existingDetail.getSubtotal();
-                orderDetailRepository.save(existingDetail);
-                existingOrderDetailMap.remove(dish.getId()); // Đánh dấu là đã xử lý
-            } else {
-                // Nếu món chưa có, thêm mới OrderDetail
-                OrderDetail newDetail = new OrderDetail();
-                newDetail.setOrder(existingOrder);
-                newDetail.setDish(dish);
-                newDetail.setQuantity(od.getQuantity());
-                newDetail.setUnitPrice(dish.getPrice());
-                newDetail.calculateSubtotal();
-                totalAmount += newDetail.getSubtotal();
-                orderDetailRepository.save(newDetail);
-            }
-        }
-
-        // Xóa OrderDetail không còn trong danh sách mới
-        for (OrderDetail odToRemove : existingOrderDetailMap.values()) {
-            orderDetailRepository.delete(odToRemove);
-        }
-
-        // Cập nhật tổng tiền đơn hàng
-        existingOrder.setTotalAmount(totalAmount);
+        // Lưu cập nhật vào DB
         return this.orderRepository.save(existingOrder);
     }
 
@@ -178,6 +137,35 @@ public class OrderService {
         Order existingOrder = fetchOrderById(id);
         this.orderDetailRepository.deleteAll(existingOrder.getOrderDetails());
         this.orderRepository.delete(existingOrder);
+    }
+
+    /** Cập nhật trạng thái Order */
+    @Transactional
+    public Order updateOrderStatus(Long orderId, String newStatus) {
+
+        User user = authService.getAuthenticatedUser();
+
+        if (!"Chef".equals(user.getRole().getName())) {
+            throw new IllegalArgumentException("Chỉ Chef mới được cập nhật đơn hàng");
+        }
+
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("Order không tồn tại"));
+
+        // Kiểm tra trạng thái hợp lệ
+        if (!isValidStatus(newStatus)) {
+            throw new IllegalArgumentException("Trạng thái không hợp lệ");
+        }
+
+        order.setStatus(newStatus);
+        return orderRepository.save(order);
+    }
+
+    /** Kiểm tra trạng thái hợp lệ */
+    private boolean isValidStatus(String status) {
+        return status.equals("PENDING") || status.equals("CONFIRMED") ||
+                status.equals("IN_PROGRESS") || status.equals("COMPLETED") ||
+                status.equals("CANCELLED");
     }
 
     /** Kiểm tra tính hợp lệ của Order */

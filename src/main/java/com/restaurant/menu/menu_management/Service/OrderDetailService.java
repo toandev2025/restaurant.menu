@@ -54,7 +54,7 @@ public class OrderDetailService {
         int totalItems = items.size();
         double totalAmount = items.stream().mapToDouble(OrderDetailDTO.Item::getSubtotal).sum();
 
-        OrderDetailDTO.Summary summary = new OrderDetailDTO.Summary();
+        OrderDetailDTO.Summary summary = new OrderDetailDTO.Summary(totalItems, totalAmount);
         summary.setTotalItems(totalItems);
         summary.setTotalAmount(totalAmount);
 

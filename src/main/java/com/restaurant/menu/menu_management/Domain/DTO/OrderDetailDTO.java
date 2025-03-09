@@ -5,8 +5,6 @@ import lombok.Setter;
 
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 @Getter
 @Setter
 public class OrderDetailDTO {
@@ -37,11 +35,17 @@ public class OrderDetailDTO {
         private String imageUrl;
     }
 
-    // Nested static class cho OrderSummaryDto
     @Getter
     @Setter
     public static class Summary {
         private Integer totalItems;
         private Double totalAmount;
+
+        // Thêm constructor để nhận tổng số món và tổng tiền
+        public Summary(Integer totalItems, Double totalAmount) {
+            this.totalItems = totalItems;
+            this.totalAmount = totalAmount;
+        }
     }
+
 }

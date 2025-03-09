@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 import java.time.LocalDateTime;
 import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Getter
@@ -29,7 +28,7 @@ public class Order {
     private String location; // Bắt buộc nếu orderType là "TAKEAWAY"
 
     @Column(nullable = false)
-    private Double totalAmount = 0.0;
+    private Double totalAmount = 0.0; // Tổng số tiền đơn hàng
 
     @Column(nullable = false)
     private String status; // Trạng thái đơn hàng: PENDING, CONFIRMED, READY, CANCELLED, COMPLETED
@@ -48,4 +47,9 @@ public class Order {
     @JsonManagedReference
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderDetail> orderDetails; // Danh sách chi tiết đơn hàng
+
+    // Thêm setter cho totalAmount
+    public void setTotalAmount(Double totalAmount) {
+        this.totalAmount = totalAmount;
+    }
 }

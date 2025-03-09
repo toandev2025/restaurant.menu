@@ -32,11 +32,20 @@ public class OrderDetail {
     @Column(nullable = false)
     private Double subtotal; // Tổng giá trị cho món ăn này (quantity * unitPrice)
 
+    @Column(nullable = false)
+    private Double priceAtOrderTime; // Giá của món ăn tại thời điểm đặt hàng
+
     private String note; // Ghi chú cụ thể cho món ăn (nếu có)
 
-    @PrePersist
-    @PreUpdate
     public void calculateSubtotal() {
+        if (this.unitPrice == null || this.quantity == null) {
+            throw new IllegalStateException("Unit price hoặc quantity không được để null");
+        }
         this.subtotal = this.unitPrice * this.quantity;
+    }
+
+    // Thêm setter cho priceAtOrderTime để tránh lỗi
+    public void setPriceAtOrderTime(Double priceAtOrderTime) {
+        this.priceAtOrderTime = priceAtOrderTime;
     }
 }

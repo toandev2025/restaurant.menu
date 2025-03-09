@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/orders")
@@ -62,5 +63,14 @@ public class OrderController {
     public ResponseEntity<String> deleteOrder(@PathVariable("id") Long id) {
         this.orderService.deleteOrder(id);
         return ResponseEntity.ok("Order và OrderDetail liên quan đã bị xóa.");
+    }
+
+    /** Cập nhật trạng thái Order (Nhận ID từ JSON) */
+    @PutMapping("/update/status")
+    public ResponseEntity<OrderDTO> updateOrderStatus(@RequestBody Map<String, String> request) {
+        Long orderId = Long.parseLong(request.get("id"));
+        String newStatus = request.get("status");
+        Order updatedOrder = orderService.updateOrderStatus(orderId, newStatus);
+        return ResponseEntity.ok(new OrderDTO(updatedOrder));
     }
 }
