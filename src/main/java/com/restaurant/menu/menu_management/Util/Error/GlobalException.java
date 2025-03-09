@@ -20,7 +20,7 @@ import com.restaurant.menu.menu_management.Domain.RestResponse;
 public class GlobalException {
 
     @ExceptionHandler({ IdInvalidException.class, UsernameNotFoundException.class,
-            BadCredentialsException.class, NoResourceFoundException.class })
+            BadCredentialsException.class, NoResourceFoundException.class, IllegalArgumentException.class })
     public ResponseEntity<RestResponse<Object>> handleExceptions(Exception ex) {
         RestResponse<Object> res = new RestResponse<>();
         res.setStatusCode(HttpStatus.BAD_REQUEST.value());

@@ -32,7 +32,7 @@ public class Order {
     private Double totalAmount = 0.0;
 
     @Column(nullable = false)
-    private String status = "PENDING"; // Trạng thái đơn hàng: PENDING, CONFIRMED, READY, CANCELLED, COMPLETED
+    private String status; // Trạng thái đơn hàng: PENDING, CONFIRMED, READY, CANCELLED, COMPLETED
 
     @Column(nullable = false)
     private LocalDateTime orderTime = LocalDateTime.now(); // Thời gian đặt hàng
