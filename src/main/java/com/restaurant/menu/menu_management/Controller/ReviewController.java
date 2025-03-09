@@ -1,14 +1,12 @@
-package com.restaurant.menu.menu_management.Controller.Review;
+package com.restaurant.menu.menu_management.Controller;
 
 import com.restaurant.menu.menu_management.Domain.Review;
 import com.restaurant.menu.menu_management.Domain.DTO.ReviewDTO;
 import com.restaurant.menu.menu_management.Service.AuthService;
-import com.restaurant.menu.menu_management.Service.Review.ReviewService;
+import com.restaurant.menu.menu_management.Service.ReviewService;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/reviews")
@@ -20,9 +18,13 @@ public class ReviewController {
     }
 
     @GetMapping("/order/{orderId}")
-    public ResponseEntity<Review> getReviewByOrderId(@PathVariable Long orderId) {
-        Optional<Review> review = reviewService.getReviewByOrderId(orderId);
-        return review.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<ReviewDTO> getReviewByOrderId(@PathVariable Long orderId) {
+        ReviewDTO reviewDTO = this.reviewService.getReviewByOrderId(orderId);
+        if (reviewDTO != null) {
+            return ResponseEntity.ok(reviewDTO);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PostMapping("/create")
@@ -32,8 +34,9 @@ public class ReviewController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<Review> updateReview(@RequestBody Review review) {
-        return ResponseEntity.ok(reviewService.updateReview(review));
+    public ResponseEntity<ReviewDTO> updateReview(@RequestBody Review review) {
+        Review newReview = this.reviewService.updateReview(review);
+        return ResponseEntity.ok(new ReviewDTO(newReview));
     }
 
     @DeleteMapping("/{id}")

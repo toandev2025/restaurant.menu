@@ -1,4 +1,4 @@
-package com.restaurant.menu.menu_management.Service.OrderDetail;
+package com.restaurant.menu.menu_management.Service;
 
 import com.restaurant.menu.menu_management.Domain.Order;
 import com.restaurant.menu.menu_management.Domain.OrderDetail;

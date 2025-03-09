@@ -23,6 +23,7 @@ public class OrderDTO {
     private String status;
     private LocalDateTime orderTime;
     private OrderDetailDTO orderDetailsDTO;
+    private ReviewDTO reviewDTO;
 
     public OrderDTO(Order order, OrderDetailDTO orderDetailDTO) {
         this.id = order.getId();
@@ -39,7 +40,7 @@ public class OrderDTO {
         this.orderDetailsDTO = orderDetailDTO;
     }
 
-    public OrderDTO(Order order) {
+    public OrderDTO(Order order, ReviewDTO reviewDTO) {
         this.id = order.getId();
         this.user = new UserDTO(order.getUser());
         this.orderType = order.getOrderType();
@@ -51,6 +52,7 @@ public class OrderDTO {
         this.totalAmount = order.getTotalAmount();
         this.status = order.getStatus();
         this.orderTime = order.getOrderTime();
+        this.reviewDTO = reviewDTO;
     }
 
     // Getters và Setters

@@ -1,8 +1,8 @@
-package com.restaurant.menu.menu_management.Controller.OrderDetail;
+package com.restaurant.menu.menu_management.Controller;
 
 import com.restaurant.menu.menu_management.Domain.OrderDetail;
 import com.restaurant.menu.menu_management.Domain.DTO.OrderDetailDTO;
-import com.restaurant.menu.menu_management.Service.OrderDetail.OrderDetailService;
+import com.restaurant.menu.menu_management.Service.OrderDetailService;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

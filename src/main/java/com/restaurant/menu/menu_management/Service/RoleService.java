@@ -1,4 +1,4 @@
-package com.restaurant.menu.menu_management.Service.Role;
+package com.restaurant.menu.menu_management.Service;
 
 import java.util.List;
 import java.util.Optional;

@@ -1,4 +1,4 @@
-package com.restaurant.menu.menu_management.Controller.Role;
+package com.restaurant.menu.menu_management.Controller;
 
 import java.util.List;
 
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.restaurant.menu.menu_management.Domain.Role;
-import com.restaurant.menu.menu_management.Service.Role.RoleService;
+import com.restaurant.menu.menu_management.Service.RoleService;
 import com.restaurant.menu.menu_management.Util.Error.IdInvalidException;
 
 @RestController

@@ -1,10 +1,10 @@
-package com.restaurant.menu.menu_management.Controller.Order;
+package com.restaurant.menu.menu_management.Controller;
 
 import com.restaurant.menu.menu_management.Domain.Order;
 import com.restaurant.menu.menu_management.Domain.DTO.OrderDTO;
 import com.restaurant.menu.menu_management.Domain.DTO.OrderDetailDTO;
-import com.restaurant.menu.menu_management.Service.Order.OrderService;
-import com.restaurant.menu.menu_management.Service.OrderDetail.OrderDetailService;
+import com.restaurant.menu.menu_management.Service.OrderDetailService;
+import com.restaurant.menu.menu_management.Service.OrderService;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,8 +26,8 @@ public class OrderController {
     /** Lấy tất cả Order dưới dạng DTO */
     @GetMapping
     public ResponseEntity<List<OrderDTO>> getAllOrders() {
-        List<OrderDTO> orderDTOs = orderService.fetchAllOrders();
-        return ResponseEntity.ok(orderDTOs);
+        List<OrderDTO> orderDTO = orderService.fetchAllOrders();
+        return ResponseEntity.ok(orderDTO);
     }
 
     /** Lấy Order theo ID dưới dạng DTO */

@@ -1,7 +1,8 @@
-package com.restaurant.menu.menu_management.Controller.Dish;
+package com.restaurant.menu.menu_management.Controller;
 
 import com.restaurant.menu.menu_management.Domain.Dish;
-import com.restaurant.menu.menu_management.Service.Dish.DishService;
+import com.restaurant.menu.menu_management.Service.DishService;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

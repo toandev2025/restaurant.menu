@@ -1,4 +1,4 @@
-package com.restaurant.menu.menu_management.Controller.User;
+package com.restaurant.menu.menu_management.Controller;
 
 import java.util.List;
 import org.springframework.http.ResponseEntity;

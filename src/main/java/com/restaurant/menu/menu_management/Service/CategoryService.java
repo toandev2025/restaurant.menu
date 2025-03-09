@@ -1,4 +1,4 @@
-package com.restaurant.menu.menu_management.Service.Category;
+package com.restaurant.menu.menu_management.Service;
 
 import com.restaurant.menu.menu_management.Domain.Category;
 import com.restaurant.menu.menu_management.Repository.CategoryRepository;

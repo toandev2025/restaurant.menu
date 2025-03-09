@@ -1,4 +1,4 @@
-package com.restaurant.menu.menu_management.Service.Dish;
+package com.restaurant.menu.menu_management.Service;
 
 import com.restaurant.menu.menu_management.Domain.Dish;
 import com.restaurant.menu.menu_management.Repository.DishRepository;

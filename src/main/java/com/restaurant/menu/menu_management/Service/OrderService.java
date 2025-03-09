@@ -1,14 +1,14 @@
-package com.restaurant.menu.menu_management.Service.Order;
+package com.restaurant.menu.menu_management.Service;
 
 import com.restaurant.menu.menu_management.Domain.*;
 import com.restaurant.menu.menu_management.Domain.DTO.OrderDTO;
+import com.restaurant.menu.menu_management.Domain.DTO.ReviewDTO;
 import com.restaurant.menu.menu_management.Repository.*;
-import com.restaurant.menu.menu_management.Service.OrderDetail.OrderDetailService;
-import com.restaurant.menu.menu_management.Service.User.UserService;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -19,22 +19,30 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final OrderDetailRepository orderDetailRepository;
     private final DishRepository dishRepository;
-    private final UserService userService;
-    private final OrderDetailService orderDetailService;
+    private final ReviewService reviewService;
+    private final AuthService authService;
 
     public OrderService(OrderRepository orderRepository, OrderDetailRepository orderDetailRepository,
-            DishRepository dishRepository, UserService userService, OrderDetailService orderDetailService) {
+            DishRepository dishRepository, ReviewService reviewService, AuthService authService) {
         this.orderRepository = orderRepository;
         this.orderDetailRepository = orderDetailRepository;
         this.dishRepository = dishRepository;
-        this.userService = userService;
-        this.orderDetailService = orderDetailService;
+        this.authService = authService;
+        this.reviewService = reviewService;
     }
 
     /** Fetch tất cả Order và chuyển đổi sang OrderDTO */
     public List<OrderDTO> fetchAllOrders() {
-        List<Order> orders = orderRepository.findAll();
-        return orders.stream().map(OrderDTO::new).collect(Collectors.toList());
+        List<Order> orders = this.orderRepository.findAll();
+        List<OrderDTO> orderDTOs = new ArrayList<>();
+
+        for (Order order : orders) {
+            ReviewDTO reviewDTO = this.reviewService.getReviewByOrderId(order.getId());
+            OrderDTO orderDTO = new OrderDTO(order, reviewDTO);
+            orderDTOs.add(orderDTO);
+        }
+
+        return orderDTOs;
     }
 
     /** Fetch Order theo ID */
@@ -48,16 +56,20 @@ public class OrderService {
 
     /** Fetch Order theo ID và chuyển đổi sang OrderDTO */
     public OrderDTO fetchOrderByIdDTO(Long id) {
-        return orderRepository.findById(id)
-                .map(OrderDTO::new) // Chuyển đổi Order sang OrderDTO nếu tồn tại
-                .orElse(null); // Trả về null nếu không tìm thấy
+        Optional<Order> orderOptional = orderRepository.findById(id);
+        if (orderOptional.isPresent()) {
+            Order order = orderOptional.get();
+            ReviewDTO reviewDTO = this.reviewService.getReviewByOrderId(order.getId());
+            return new OrderDTO(order, reviewDTO);
+        }
+        return null; // Trả về null nếu không tìm thấy
     }
 
     /** Create Order */
     @Transactional
     public Order createOrder(Order orderRequest) {
 
-        User user = this.userService.fetchUserById(orderRequest.getUser().getId());
+        User user = this.authService.getAuthenticatedUser();
 
         validateOrder(orderRequest);
 

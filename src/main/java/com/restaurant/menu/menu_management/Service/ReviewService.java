@@ -1,13 +1,11 @@
-package com.restaurant.menu.menu_management.Service.Review;
+package com.restaurant.menu.menu_management.Service;
 
 import com.restaurant.menu.menu_management.Domain.Review;
 import com.restaurant.menu.menu_management.Domain.Order;
 import com.restaurant.menu.menu_management.Domain.User;
-import com.restaurant.menu.menu_management.Domain.DTO.UserDTO;
+import com.restaurant.menu.menu_management.Domain.DTO.ReviewDTO;
 import com.restaurant.menu.menu_management.Repository.ReviewRepository;
 import com.restaurant.menu.menu_management.Repository.OrderRepository;
-import com.restaurant.menu.menu_management.Repository.UserRepository;
-import com.restaurant.menu.menu_management.Service.AuthService;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,16 +25,27 @@ public class ReviewService {
         this.authService = authService;
     }
 
-    public Optional<Review> getReviewByOrderId(Long orderId) {
-        return this.reviewRepository.findByOrderId(orderId);
+    public ReviewDTO getReviewByOrderId(Long orderId) {
+        Optional<Review> reviewOptional = this.reviewRepository.findByOrderId(orderId);
+        if (reviewOptional.isPresent()) {
+            Review review = reviewOptional.get();
+            return new ReviewDTO(review); // Chuyển đổi sang ReviewDTO
+        }
+        return null; // Trả về null nếu không tìm thấy
     }
 
     @Transactional
     public Review createReview(Review reviewRequest) {
-        User user = this.authService.getAuthenticatedUser(); // Lấy user từ JWT
 
         Order order = this.orderRepository.findById(reviewRequest.getOrder().getId())
                 .orElseThrow(() -> new IllegalArgumentException("Order không tồn tại"));
+
+        User user = this.authService.getAuthenticatedUser(); // Lấy user từ JWT
+
+        // Kiểm tra xem user hiện tại có phải là người sở hữu đơn hàng không
+        if (order.getUser() != null && order.getUser().getId() != user.getId()) {
+            throw new IllegalArgumentException("Bạn chỉ có thể đánh giá đơn hàng của chính mình");
+        }
 
         if (!"COMPLETED".equals(order.getStatus())) {
             throw new IllegalArgumentException("Chỉ có thể đánh giá đơn hàng đã hoàn thành (COMPLETED)");
@@ -56,8 +65,19 @@ public class ReviewService {
 
     @Transactional
     public Review updateReview(Review reviewRequest) {
+
+        Order order = this.orderRepository.findById(reviewRequest.getOrder().getId())
+                .orElseThrow(() -> new IllegalArgumentException("Order không tồn tại"));
+
+        User user = this.authService.getAuthenticatedUser(); // Lấy user từ JWT
+
         Review existingReview = reviewRepository.findById(reviewRequest.getId())
                 .orElseThrow(() -> new IllegalArgumentException("Review không tồn tại"));
+
+        // Kiểm tra xem user hiện tại có phải là người sở hữu đơn hàng không
+        if (order.getUser() != null && order.getUser().getId() != user.getId()) {
+            throw new IllegalArgumentException("Bạn chỉ có thể đánh giá đơn hàng của chính mình");
+        }
 
         existingReview.setRating(reviewRequest.getRating());
         existingReview.setComment(reviewRequest.getComment());
