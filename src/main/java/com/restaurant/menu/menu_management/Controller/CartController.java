@@ -15,18 +15,18 @@ public class CartController {
 
     @GetMapping("/{userId}")
     public ResponseEntity<CartDTO.CartResponse> getCart(@PathVariable Long userId) {
-        return ResponseEntity.ok(cartService.getCart(userId));
+        return ResponseEntity.ok(this.cartService.getCart(userId));
     }
 
     @PostMapping("/add")
     public ResponseEntity<CartDTO.CartResponse> addToCart(@RequestBody CartDTO.AddToCartRequest request) {
-        return ResponseEntity.ok(cartService.addToCart(
+        return ResponseEntity.ok(this.cartService.addToCart(
                 request.getUserId(), request.getDishId(), request.getQuantity(), request.getNote()));
     }
 
     @DeleteMapping("/remove")
     public ResponseEntity<Void> removeFromCart(@RequestBody CartDTO.RemoveFromCartRequest request) {
-        cartService.removeFromCart(request.getUserId(), request.getCartItemId());
+        this.cartService.removeFromCart(request.getUserId(), request.getCartItemId());
         return ResponseEntity.noContent().build();
     }
 

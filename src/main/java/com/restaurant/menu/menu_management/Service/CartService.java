@@ -105,10 +105,10 @@ public class CartService {
         return getCart(userId);
     }
 
-    // Xóa một món khỏi giỏ hàng
     @Transactional
     public void removeFromCart(Long userId, Long cartItemId) {
         User user = this.authService.getAuthenticatedUser();
+
         Cart cart = getOrCreateCart(user);
 
         boolean removed = cart.getCartItems().removeIf(item -> item.getId().equals(cartItemId));
@@ -117,7 +117,11 @@ public class CartService {
             throw new EntityNotFoundException("Cart item not found in user's cart");
         }
 
-        cartRepository.save(cart);
+        if (cart.getCartItems().isEmpty()) {
+            this.cartRepository.delete(cart);
+        } else {
+            this.cartRepository.save(cart);
+        }
     }
 
     @Transactional
