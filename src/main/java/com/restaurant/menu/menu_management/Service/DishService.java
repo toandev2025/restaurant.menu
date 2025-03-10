@@ -11,11 +11,9 @@ import java.util.Optional;
 @Service
 public class DishService {
     private final DishRepository dishRepository;
-    private final CategoryRepository categoryRepository;
 
     public DishService(DishRepository dishRepository, CategoryRepository categoryRepository) {
         this.dishRepository = dishRepository;
-        this.categoryRepository = categoryRepository;
     }
 
     public List<Dish> fetchAllDishes() {

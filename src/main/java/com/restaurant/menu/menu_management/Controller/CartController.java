@@ -33,11 +33,13 @@ public class CartController {
     @PostMapping("/checkout")
     public ResponseEntity<OrderDTO> checkout(@RequestBody CartDTO.CheckoutRequest request) {
         return ResponseEntity.ok(cartService.checkout(
-                request.getCartId(), // 🆕 Lấy `cartId`
+                request.getCartId(),
                 request.getUserId(),
                 request.getOrderType(),
                 request.getLocation(),
-                request.getTableNumber()));
+                request.getTableNumber(),
+                request.getNote(),
+                request.getPhoneNumber()));
     }
 
 }

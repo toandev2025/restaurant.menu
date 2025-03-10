@@ -37,11 +37,13 @@ public class CartDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class CheckoutRequest {
-        private Long cartId; // 🆕 Thêm cartId để xác định giỏ hàng
+        private Long cartId;
         private Long userId;
-        private String orderType; // "DINE_IN" hoặc "TAKEAWAY"
-        private String location; // Nếu orderType là "TAKEAWAY"
-        private Integer tableNumber;// Nếu orderType là "DINE_IN"
+        private String orderType;
+        private String location;
+        private Integer tableNumber;
+        private String note;
+        private String phoneNumber;
     }
 
     /** DTO cho phản hồi giỏ hàng */

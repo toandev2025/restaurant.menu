@@ -121,15 +121,14 @@ public class CartService {
     }
 
     @Transactional
-    public OrderDTO checkout(Long cartId, Long userId, String orderType, String location, Integer tableNumber) {
+    public OrderDTO checkout(Long cartId, Long userId, String orderType, String location, Integer tableNumber,
+            String note, String phoneNumber) {
 
         User user = this.authService.getAuthenticatedUser();
 
-        // 🔥 Tìm cart theo cartId và user
         Cart cart = cartRepository.findById(cartId)
                 .orElseThrow(() -> new EntityNotFoundException("Cart not found"));
 
-        // ✅ Kiểm tra cart có thuộc về user không
         if (!Objects.equals(cart.getUser().getId(), user.getId())) {
             throw new IllegalArgumentException("The cart does not belong to you");
         }
@@ -156,6 +155,8 @@ public class CartService {
         order.setStatus("PENDING");
         order.setOrderType(orderType);
         order.setTotalAmount(totalPrice);
+        order.setNote(note);
+        order.setPhoneNumber(phoneNumber);
 
         if ("TAKEAWAY".equals(orderType)) {
             if (location == null || location.isBlank()) {
@@ -169,10 +170,11 @@ public class CartService {
             order.setTableNumber(tableNumber);
         }
 
-        final Order savedOrder = orderRepository.save(order);
+        final Order savedOrder = this.orderRepository.save(order);
 
         List<OrderDetailDTO.Item> orderDetailItems = cart.getCartItems().stream().map(cartItem -> {
             OrderDetail orderDetail = new OrderDetail();
+
             orderDetail.setOrder(savedOrder);
             orderDetail.setDish(cartItem.getDish());
             orderDetail.setQuantity(cartItem.getQuantity());
@@ -206,8 +208,8 @@ public class CartService {
         orderDetailDTO.setItems(orderDetailItems);
         orderDetailDTO.setSummary(new OrderDetailDTO.Summary(orderDetailItems.size(), totalPrice));
 
-        cartItemRepository.deleteAll(cart.getCartItems());
-        cartRepository.delete(cart);
+        this.cartItemRepository.deleteAll(cart.getCartItems());
+        this.cartRepository.delete(cart);
 
         return new OrderDTO(savedOrder, orderDetailDTO);
     }
